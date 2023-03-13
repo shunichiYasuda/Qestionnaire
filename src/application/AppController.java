@@ -30,6 +30,8 @@ public class AppController {
 	List<String> dataList = new ArrayList<String>();
 	//ファイルの場所を記憶する String
 	String dir = null;
+	//このファイルに入っている学生のリスト
+	List<CStudent> stuList = new ArrayList<CStudent>();
 	//
 	int[] revItem = {0,0,0,0,0,0,1,0,1,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1,1,0,1,1,1,0,1,1,1,0,0,1,0,1,0,0,1,0,1,1,1,1,0,1,0,0,0,0,0,1,0,1,0,0,1,0,0,0,1};
 	
@@ -68,6 +70,7 @@ public class AppController {
 	@FXML
 	void execAction() {
 		log.appendText("データ総数："+ (dataList.size()-1) );
+		
 		//変換テスト
 //		int in = 5;
 //		log.appendText("\n入力  "+ in);
