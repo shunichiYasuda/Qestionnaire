@@ -22,20 +22,33 @@ public class CStudent {
 		seScore=0;
 		kissScore=0;
 		adapScore=0;
+	}//end of constructor
+	
+	//int 配列をコピーするメソッド。ただし、同じ長さであること
+	private String copyRec(int[] in, int[] dest) {
+		String r ="";
+		if(in.length!=dest.length) {
+			r="Error. in copyRec()";
+		}else {
+			for(int i=0;i<in.length;i++) {
+				dest[i] = in[i];
+			}
+		}
+		return r;
 	}
 	
-	//リストで読み出したアンケート全体のint配列をいっぺんに読み込む。
-	public void setRecord(int[] in) {
-		for(int i=0;i<in.length;i++) {
-			
-		}
-	}
 	//getter
 	public String getId() {
 		return this.id;
 	}
+	//
+	public int[] getBasic() {
+		return this.basicProperties;
+	}
 	//setter
 	public void setBasicProperties(int[] in) {
-		
+		String r =copyRec(in,basicProperties);
+		if(!r.equals("")) System.out.println("Error in basicProperties");
 	}
+	
 }

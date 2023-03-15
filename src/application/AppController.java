@@ -75,25 +75,33 @@ public class AppController {
 	void execAction() {
 		log.appendText("データ総数：" + (dataList.size() - 1));
 		String fieldName = dataList.get(0);
+		String[] fieldRecord = fieldName.split(",");
+		log.appendText("\nフィールド行の長さ："+ fieldRecord.length);
 		dataList.remove(0); // 先頭のフィールド名を削除
 		for (String s : dataList) {
 			String[] allArray = s.split(",");
+			//check
+			if(allArray.length !=78) {
+				log.appendText("Error:"+ allArray[0]);
+			}
 			CStudent stu = new CStudent(allArray[0]);
 			// 学籍番号以外の回答を String からint に変換
 			// 1-4は基本属性。5-14自尊感情。15-32Kiss-18, 33-76学校適応感
 			// revItem には先頭にダミーを入れているので、レコードの指標は同じでよい。
 			//回答の切り分け
-			String[] bp = new String[4];//基本属性
-			String[] se = new String[10]; //自尊感情
-			String[] k18 = new String[18]; //kiss-18
-			String[] adp = new String[44];//適応感
-			//bp = strToInt(allArray,1,4);
+			String[] bp = cutter(allArray,1,4);//基本属性
+			int[] bp_r = cutter(revItem,1,4);
+			int[] bpValue = strToInt(bp,bp_r);
+			stu.setBasicProperties(bpValue);
+			String[] se = cutter(allArray,5,14); //自尊感情
+			String[] k18 = cutter(allArray,15,32); //kiss-18
+			String[] adp = cutter(allArray,33,76);//適応感
 			stuList.add(stu);
 		}
 		//
 		List<String> outputList = new ArrayList<String>();
 		for (CStudent s : stuList) {
-			outputList.add(s.getId());
+			outputList.add(s.getId()+intRecToString(s.getBasic()));
 		}
 		// 変換テスト
 //		int in = 5;
@@ -101,25 +109,51 @@ public class AppController {
 //		int out = transForm(in);
 //		log.appendText("\n出力  "+out);
 		// ファイル書き出しテスト
-		saveFile("基本属性", outputList, "学籍番号");
+		saveFile("基本属性", outputList, fieldName);
 	}// end of execAction()
 
-	// 回答は長いString[] になっているので、ここでそれぞれの長さに区切る
-	// 変換する際に逆転項目をちゃんと処理する。長さが異なるから始めと終わりの場所もいれておく。
-	private int[] strToInt(String[] in, int start, int end) {
-		//in は全回答だ。
-		int[] r = new int[end - start +1];
+	// 変換する際に逆転項目をちゃんと処理するために
+	//revItem を対応する長さに切った配列 rev も与える。
+	private int[] strToInt(String[] in, int[] rev) {
+		//in は回答が入った文字列配列。
+		int[] r = new int[in.length];
 		int v = 0;
-		for (int i=0;i<r.length;i++) {
+		for(int i=0;i<r.length;i++) {
 			try {
 				v = Integer.parseInt(in[i]);
-			} catch (NumberFormatException e) {
-				v = 0;
+				if(rev[i]==1) {
+					v=transForm(v);
+				}
+			}catch(NumberFormatException e){
+				v=0;
 			}
 			r[i] = v;
 		}
 		return r;
-
+	}
+	//配列カッター。ここで予め必要な長さに切っておく。文字列配列であることに注意
+	private String[] cutter(String[] in , int start, int end) {
+		String[] r = new String[end-start+1];
+		for(int i=0;i<r.length;i++) {
+			r[i] = in[start+i];
+		}	
+		return r;
+	}
+	//配列カッター int 版
+	private int[] cutter(int[] in , int start, int end) {
+		int[] r = new int[end-start+1];
+		for(int i=0;i<r.length;i++) {
+			r[i] = in[start+i];
+		}	
+		return r;
+	}
+	//int[] をカンマ区切りのStringに変換
+	private String intRecToString(int[] in) {
+		String r ="";
+		for(int d: in) {
+			r += ","+d;
+		}
+		return r;
 	}
 
 	// 逆転項目の得点処理
@@ -152,7 +186,11 @@ public class AppController {
 		}
 
 	} // end of saveFile()
-
-	// テーブルを縦に分割して、
+	//配列を確認するためのプリンタ
+	private void printRec(int[] in) {
+		for(int d:in) {
+			System.out.println(d);
+		}
+	}
 
 }
