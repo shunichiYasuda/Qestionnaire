@@ -3,7 +3,7 @@ package application;
 public class CStudent {
 	String id;
 	//基本属性。性別、出身、部活経験、志望順位、ｗと空白は「0」として記録
-	int[] basic_properties ;
+	int[] basicProperties ;
 	//自尊感情。逆転項目の得点処理済みの数値。ｗと空白は「0」として記録
 	int[] selfEsteem;
 	//Kiss-18。逆転項目の得点処理済みの数値。ｗと空白は「0」として記録
@@ -15,7 +15,7 @@ public class CStudent {
 	//
 	public CStudent(String in) {
 		this.id = in;
-		this.basic_properties = = new int[4];
+		this.basicProperties =  new int[4];
 		this.selfEsteem = new int[10];
 		this.kiss18 = new int[18];
 		this.adaptation = new int[44];
@@ -29,5 +29,13 @@ public class CStudent {
 		for(int i=0;i<in.length;i++) {
 			
 		}
+	}
+	//getter
+	public String getId() {
+		return this.id;
+	}
+	//setter
+	public void setBasicProperties(int[] in) {
+		
 	}
 }
