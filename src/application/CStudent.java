@@ -49,6 +49,7 @@ public class CStudent {
 	public void setBasicProperties(int[] in) {
 		String r =copyRec(in,basicProperties);
 		if(!r.equals("")) System.out.println("Error in basicProperties");
+		//基本属性には合計点処理は必要ない。
 	}
 	
 }

@@ -4,9 +4,11 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,6 +80,15 @@ public class AppController {
 		String[] fieldRecord = fieldName.split(",");
 		log.appendText("\nフィールド行の長さ："+ fieldRecord.length);
 		dataList.remove(0); // 先頭のフィールド名を削除
+		//それぞれのフィールドラベル
+		String bp_label = stringRecToString(cutter(fieldRecord,1,4));
+		String se_label =stringRecToString(cutter(fieldRecord,5,14));
+		String k18_label = stringRecToString(cutter(fieldRecord,15,32));
+		String adp_label =stringRecToString(cutter(fieldRecord,33,76));
+		
+		//出力されるべき内容を保持したListをつくっておいて、すべて以下のループで処理する。
+		//ただし、上のフィールドラベルは保持しない。回答データと合計だけ。
+		List<String> outputList = new ArrayList<String>();
 		for (String s : dataList) {
 			String[] allArray = s.split(",");
 			//check
@@ -85,23 +96,25 @@ public class AppController {
 				log.appendText("Error:"+ allArray[0]);
 			}
 			CStudent stu = new CStudent(allArray[0]);
+			//書き込む際に学籍番号をString の先頭にいれればよいはなし。
 			// 学籍番号以外の回答を String からint に変換
 			// 1-4は基本属性。5-14自尊感情。15-32Kiss-18, 33-76学校適応感
 			// revItem には先頭にダミーを入れているので、レコードの指標は同じでよい。
-			//回答の切り分け
+			
 			String[] bp = cutter(allArray,1,4);//基本属性
-			int[] bp_r = cutter(revItem,1,4);
-			int[] bpValue = strToInt(bp,bp_r);
-			stu.setBasicProperties(bpValue);
-			String[] se = cutter(allArray,5,14); //自尊感情
-			String[] k18 = cutter(allArray,15,32); //kiss-18
-			String[] adp = cutter(allArray,33,76);//適応感
-			stuList.add(stu);
-		}
-		//
-		List<String> outputList = new ArrayList<String>();
-		for (CStudent s : stuList) {
-			outputList.add(s.getId()+intRecToString(s.getBasic()));
+			//基本属性には合計点処理が必要ないので、そのままString[]でおいておく
+			//回答の切り分け.ただし、回答内容についてはそのまま書き出すことになるので、
+			//allArray配列の対応フィールドは別に取っておく必要がある。配列である必要もないので、文字列にする
+			String se = stringRecToString(cutter(allArray,5,14)); //自尊感情
+			String k18 = stringRecToString(cutter(allArray,15,32)); //kiss-18
+			String adp = stringRecToString(cutter(allArray,33,76));//適応感
+			//逆転項目処理をした int配列は合計点処理がされる。
+			int[] seValue = strToInt(allArray,5,14);
+			//合計処理
+			int seSum = sum(seValue);
+			//書き出しのための文字列処理
+			String outputStr = allArray[0]+se+","+seSum;
+			outputList.add(outputStr);
 		}
 		// 変換テスト
 //		int in = 5;
@@ -109,7 +122,7 @@ public class AppController {
 //		int out = transForm(in);
 //		log.appendText("\n出力  "+out);
 		// ファイル書き出しテスト
-		saveFile("基本属性", outputList, fieldName);
+		saveFile("自尊感情", outputList, "学籍番号"+se_label+",合計");
 	}// end of execAction()
 
 	// 変換する際に逆転項目をちゃんと処理するために
@@ -129,6 +142,19 @@ public class AppController {
 			}
 			r[i] = v;
 		}
+		return r;
+	}
+	//別メソッド。
+	private int[] strToInt(String[] in, int start, int end) {
+		//ここでの in は allArray であることが前提となる
+		//自尊感情等の領域の長さの配列に回答をString[] として渡す。
+		String[] s = cutter(in,start,end); 
+		//ここまでで、s[] には回答がそのまま。文字列だ。
+		//revItem はここからでも見えるので、cutter をここで使う。
+		int[] rev = cutter(revItem,start,end);
+		//rev には逆転項目フラグがはいった。
+		//逆転項目の処理
+		int[] r = strToInt(s,rev);
 		return r;
 	}
 	//配列カッター。ここで予め必要な長さに切っておく。文字列配列であることに注意
@@ -155,6 +181,14 @@ public class AppController {
 		}
 		return r;
 	}
+	//String[] をカンマ区切りのStringに変換
+	private String stringRecToString(String[]in) {
+		String r ="";
+		for(String d: in) {
+			r += ","+d;
+		}
+		return r;
+	}
 
 	// 逆転項目の得点処理
 	private int transForm(int in) {
@@ -172,8 +206,10 @@ public class AppController {
 		log.appendText("\n" + filename);
 		File outFile = new File(filename);
 		try {
-			FileWriter fw = new FileWriter(outFile);
-			BufferedWriter bw = new BufferedWriter(fw);
+			FileOutputStream fos = new FileOutputStream(outFile);
+			OutputStreamWriter osw = new OutputStreamWriter(fos,"Shift-JIS");
+			//FileWriter fw = new FileWriter(outFile);
+			BufferedWriter bw = new BufferedWriter(osw);
 			PrintWriter pw = new PrintWriter(bw);
 			pw.println(field);
 			for (String s : list) {
@@ -191,6 +227,15 @@ public class AppController {
 		for(int d:in) {
 			System.out.println(d);
 		}
+	}
+	
+	//合計処理
+	private int sum(int[] in) {
+		int r = 0;
+		for(int d:in) {
+			r+=d;
+		}
+		return r;
 	}
 
 }
