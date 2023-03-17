@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
@@ -15,6 +17,11 @@
                 <Button fx:id="openBtn" mnemonicParsing="false" onAction="#openAction" text="open..." />
                   <Button fx:id="execBtn" mnemonicParsing="false" onAction="#execAction" text="exec" />
                   <Button fx:id="quitBtn" mnemonicParsing="false" onAction="#quitAction" text="quit" />
+                  <Label text="入学年度" />
+                  <TextField fx:id="enterYear" />
+                  <Label text="回答年次" />
+                  <TextField fx:id="ansYear" />
+                  <Button fx:id="clearBtn" mnemonicParsing="false" onAction="#clearAction" text="clear" />
               </items>
             </ToolBar>
             <TextArea fx:id="log" layoutY="46.0" prefHeight="535.0" prefWidth="637.0" />
