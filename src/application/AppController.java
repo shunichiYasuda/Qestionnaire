@@ -103,14 +103,14 @@ public class AppController {
 					id = orgLine[4];
 					for (int i = 0; i < tmpLine.length; i++) {
 						// オリジナルの内容を固定レコードにつめるが、内容が空白の場合は除く
-						if(!orgLine[i+9].equals(""))
-						tmpLine[i] = orgLine[i + 9]; 
+						//if(!(orgLine[i+9].equals(""))orgLine[i+9].contains(" ")) {
+						//tmpLine[i] = orgLine[i + 9]; 
 					}
 					//ここでできたtmpLineのチェック
-//					for(String str : tmpLine) {
-//						log.appendText(str+",");
-//					}
-//					log.appendText(":"+ tmpLine.length+"\n");
+					for(String str : tmpLine) {
+						log.appendText(str+",");
+					}
+					log.appendText(":"+ tmpLine.length+"\n");
 					// リストにつめる String を作る
 					String str = id + stringRecToString(tmpLine);
 					// log.appendText(str+"\n");
