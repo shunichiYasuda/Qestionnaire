@@ -13,6 +13,8 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -98,22 +100,40 @@ public class AppController {
 				for (int i = 0; i < tmpLine.length; i++) {
 					tmpLine[i] = "T"; // 空白文字列で埋め尽くす
 				}
-				if (!orgLine[4].contains("   ")) {
+				//Pattern p = Pattern.compile("^11");
+				Pattern p = Pattern.compile("\\d{8}");
+		        Matcher m = p.matcher(orgLine[4]);
+				if (m.find()) {
 					// 学籍番号をまずはidに。 後でString を作る際の先頭になる。
 					id = orgLine[4];
-					for (int i = 0; i < tmpLine.length; i++) {
+					//ループ回数はorg と tmp の短い方
+					int limitLength;
+					if(orgLine.length<tmpLine.length) {
+						limitLength = orgLine.length;
+					}else {
+						limitLength = tmpLine.length;
+					}
+					for (int i = 0; i < limitLength; i++) {
 						// オリジナルの内容を固定レコードにつめるが、内容が空白の場合は除く
+						//log.appendText(orgLine[i+9]);
+						Pattern p2 = Pattern.compile("[0-9]");
+				        Matcher m2 = p2.matcher(orgLine[i+9]);
+				        if(m2.find()) { //中味が数値の場合は
+				        	tmpLine[i] = orgLine[i+9];
+				        	//log.appendText(tmpLine[i]);
+				        }
 						//if(!(orgLine[i+9].equals(""))orgLine[i+9].contains(" ")) {
 						//tmpLine[i] = orgLine[i + 9]; 
 					}
+					//log.appendText("\n");
 					//ここでできたtmpLineのチェック
-					for(String str : tmpLine) {
-						log.appendText(str+",");
-					}
-					log.appendText(":"+ tmpLine.length+"\n");
+//					for(String str : tmpLine) {
+//						log.appendText(str+",");
+//					}
+					//log.appendText(":"+ tmpLine.length+"\n");
 					// リストにつめる String を作る
 					String str = id + stringRecToString(tmpLine);
-					// log.appendText(str+"\n");
+					//log.appendText(str+"\n");
 					dataList.add(str);
 				} // end of for ..学籍番号がないレコードははじく
 			} // end of while()
@@ -155,9 +175,9 @@ public class AppController {
 //		for(String s:dataList) {
 //			String[] allArray = s.split(",");
 //			log.appendText(s + ":" + allArray.length + "\n");
-//			for (String r : allArray) {
-//				log.appendText(r + ",");
-//			}
+////			for (String r : allArray) {
+////				log.appendText(r + ",");
+////			}
 //			log.appendText("\n");
 //		}
 		process(topStr + "自尊感情", 5, 14);
